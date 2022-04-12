@@ -7,6 +7,7 @@ declare(strict_types=1);
  * @link     https://www.hyperf.io
  * @document https://hyperf.wiki
  * @contact  group@hyperf.io
+ * @author   liuuniverse@139.com
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 namespace Hyperf\Server\Command;
