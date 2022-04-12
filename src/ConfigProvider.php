@@ -11,6 +11,7 @@ declare(strict_types=1);
  */
 namespace Hyperf\Server;
 
+use Hyperf\Server\Command\ReloadServer;
 use Hyperf\Server\Command\RestartServer;
 use Hyperf\Server\Command\StartServer;
 use Hyperf\Server\Command\StopServer;
@@ -35,6 +36,7 @@ class ConfigProvider
             'commands' => [
                 StartServer::class,
                 StopServer::class,
+                ReloadServer::class,
                 RestartServer::class,
             ],
             'annotations' => [
