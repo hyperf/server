@@ -116,10 +116,11 @@ class SwowServer implements ServerInterface
             $type = $server->getType();
             $host = $server->getHost();
             $port = $server->getPort();
+            $sockType = $server->getSockType();
             $callbacks = array_replace($config->getCallbacks(), $server->getCallbacks());
             $server->setSettings(array_replace($config->getSettings(), $server->getSettings()));
 
-            $this->server = $this->makeServer($type, $host, $port, $server->getSettings());
+            $this->server = $this->makeServer($type, $host, $port, $server->getSettings(), $sockType);
 
             $this->bindServerCallbacks($this->server, $type, $name, $callbacks);
 
@@ -209,13 +210,13 @@ class SwowServer implements ServerInterface
                             }
                         });
                     }
-                    if (isset($callbacks[Event::ON_PACKET])) {
-                        [$receiveHandler, $receiveMethod] = $this->getCallbackMethod(Event::ON_PACKET, $callbacks);
-                        if ($server instanceof BaseServer) {
-                            $server->handle(function (Socket $connection, $data, $clientInfo) use ($receiveHandler, $receiveMethod) {
-                                $receiveHandler->{$receiveMethod}($connection, $data, $clientInfo);
-                            });
-                        }
+                }
+                if (isset($callbacks[Event::ON_PACKET])) {
+                    [$receiveHandler, $receiveMethod] = $this->getCallbackMethod(Event::ON_PACKET, $callbacks);
+                    if ($server instanceof BaseServer) {
+                        $server->handle(function (Socket $connection, $data, $clientInfo) use ($receiveHandler, $receiveMethod) {
+                            $receiveHandler->{$receiveMethod}($connection, $data, $clientInfo);
+                        });
                     }
                 }
                 return;
@@ -234,7 +235,7 @@ class SwowServer implements ServerInterface
         return [$handler, $method];
     }
 
-    protected function makeServer($type, $host, $port, $settings)
+    protected function makeServer($type, $host, $port, $settings, $sockType)
     {
         switch ($type) {
             case ServerInterface::SERVER_HTTP:
@@ -244,7 +245,7 @@ class SwowServer implements ServerInterface
                 $server->bind($host, $port);
                 return $server;
             case ServerInterface::SERVER_BASE:
-                $server = new BaseServer($this->logger);
+                $server = new BaseServer($this->logger, $sockType);
                 $this->initServerSettings($server, $settings);
                 $server->bind($host, $port);
                 return $server;
